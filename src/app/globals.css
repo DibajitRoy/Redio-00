@@ -1,26 +1,234 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-cream: #F4EBDD;
+  --color-oldpaper: #E8D8C0;
+  --color-coffee: #5A4030;
+  --color-deepbrown: #2B211B;
+  --color-gold: #B99A63;
+  --color-darkgreen: #29352D;
+
+  --color-night-bg: #F1E6D3;
+  --color-night-card: #E9DAC0;
+  --color-night-text: #2E2016;
+  --color-night-accent: #B99A63;
+
+  --font-serifBn: var(--font-serif-bn), serif;
+  --font-sansBn: var(--font-sans-bn), sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  overflow-x: clip;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #F1E6D3;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+  color: #2E2016;
+}
+
+::selection {
+  background: #B99A63;
+  color: #2B211B;
+}
+
+/* পুরো প্রস্থে ছড়ানো section (container-এর বাইরে) */
+.full-bleed {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+}
+
+/* ===== Hero banner (animated) ===== */
+.hero { --h: clamp(300px, 37.5vw, 720px); position: relative; height: var(--h); overflow: hidden; background: #2b211b; }
+.hero-stage { position: absolute; left: 50%; top: 50%; width: max(100%, calc(var(--h) * 2.6667)); aspect-ratio: 2048 / 768; transform: translate(-50%, -50%); }
+.hero-stage > img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; max-width: none; }
+
+/* চুল: একই ছবির কপি, শুধু চুলের অংশ মাস্ক করে দোলানো */
+.hero-hair {
+  -webkit-mask-image: radial-gradient(ellipse 5% 13% at 61.3% 52%, #000 45%, transparent 100%), radial-gradient(ellipse 5.8% 15% at 58.5% 72%, #000 45%, transparent 100%), radial-gradient(ellipse 5% 12% at 55.5% 90%, #000 45%, transparent 100%);
+  mask-image: radial-gradient(ellipse 5% 13% at 61.3% 52%, #000 45%, transparent 100%), radial-gradient(ellipse 5.8% 15% at 58.5% 72%, #000 45%, transparent 100%), radial-gradient(ellipse 5% 12% at 55.5% 90%, #000 45%, transparent 100%);
+  transform-origin: 61% 42%;
+  animation: hairSway 4s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes hairSway {
+  0%, 100% { transform: skewX(-4.5deg) translateX(-0.25%) rotate(-0.6deg); }
+  50%      { transform: skewX(5deg) translateX(0.3%) rotate(0.8deg); }
+}
+
+/* ডান পাশের পর্দা */
+.hero-curtain {
+  -webkit-mask-image: linear-gradient(to right, transparent 91.5%, #000 94.5%);
+  mask-image: linear-gradient(to right, transparent 91.5%, #000 94.5%);
+  transform-origin: 96% 0%;
+  animation: curtainSway 7s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes curtainSway {
+  0%, 100% { transform: skewX(-0.5deg); }
+  50%      { transform: skewX(0.9deg); }
+}
+
+/* সূর্যের আভা */
+.hero-glow {
+  position: absolute; left: 88%; top: 52%; width: 34%; aspect-ratio: 1; transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 190, 90, .55), rgba(255, 150, 60, .15) 45%, transparent 70%);
+  mix-blend-mode: screen; pointer-events: none; animation: glowPulse 6s ease-in-out infinite;
+}
+@keyframes glowPulse { 0%, 100% { opacity: .45; } 50% { opacity: .9; } }
+
+/* উড়ন্ত পাখি */
+.hero-bird { position: absolute; width: 3%; fill: #2a1a10; opacity: 0; pointer-events: none; animation: birdFly 15s linear infinite; }
+.hero-bird .wl { transform-origin: 20px 12px; animation: flapL .55s ease-in-out infinite alternate; }
+.hero-bird .wr { transform-origin: 20px 12px; animation: flapR .55s ease-in-out infinite alternate; }
+@keyframes flapL { from { transform: rotate(20deg); } to { transform: rotate(-24deg); } }
+@keyframes flapR { from { transform: rotate(-20deg); } to { transform: rotate(24deg); } }
+@keyframes birdFly {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0; }
+  10%  { opacity: .9; }
+  80%  { opacity: .8; }
+  100% { transform: translate(-480%, -300%) scale(.55); opacity: 0; }
+}
+
+/* ভাসমান ধুলোকণা: বড়, সাদা-সোনালি, আভা সহ */
+.hero-mote {
+  position: absolute;
+  width: clamp(5px, 0.5vw, 11px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fffaf0;
+  box-shadow: 0 0 6px 2px rgba(255, 200, 100, .95), 0 0 14px 4px rgba(255, 160, 60, .5);
+  opacity: 0;
+  pointer-events: none;
+  animation: moteFloat var(--d, 11s) linear infinite;
+  animation-delay: var(--dl, 0s);
+}
+@keyframes moteFloat {
+  0%   { transform: translate(0, 0) scale(.6); opacity: 0; }
+  15%  { opacity: 1; }
+  50%  { transform: translate(2vw, -6vh) scale(1); }
+  85%  { opacity: .8; }
+  100% { transform: translate(-1vw, -14vh) scale(.7); opacity: 0; }
+}
+
+/* রেডিও থেকে সুরের চিহ্ন */
+.hero-note {
+  position: absolute;
+  font-size: clamp(18px, 2.4vw, 44px);
+  line-height: 1;
+  color: #fff3c4;
+  text-shadow: 0 0 5px rgba(90, 40, 5, .9), 0 0 14px rgba(255, 190, 90, .95);
+  opacity: 0;
+  pointer-events: none;
+  animation: noteFloat 6s ease-out infinite;
+  animation-delay: var(--dl, 0s);
+}
+@keyframes noteFloat {
+  0%   { transform: translate(0, 0) scale(.6) rotate(0deg); opacity: 0; }
+  15%  { opacity: 1; }
+  60%  { transform: translate(calc(var(--dx) * .5), -6vh) scale(1) rotate(calc(var(--rot) * .5)); opacity: 1; }
+  100% { transform: translate(var(--dx), -13vh) scale(1.25) rotate(var(--rot)); opacity: 0; }
+}
+
+/* সোনালি ribbon-এ চলমান লেখা */
+.marquee-track { display: inline-flex; white-space: nowrap; animation: marquee 45s linear infinite; }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-hair, .hero-curtain, .hero-glow, .hero-bird, .hero-bird .wl, .hero-bird .wr, .hero-mote, .hero-note, .marquee-track { animation: none !important; }
+  .hero-bird, .hero-mote, .hero-note { display: none; }
+}
+
+/* ===== ভাসমান ভিডিও বক্স ===== */
+.videobox-wrap {
+  position: fixed;
+  right: 16px;
+  bottom: 92px;
+  z-index: 60;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  border: 2px solid var(--color-gold);
+  background: var(--color-deepbrown);
+  transition: width 0.25s ease, height 0.25s ease, opacity 0.25s ease;
+}
+.videobox-open {
+  width: 260px;
+  height: 172px;
+  opacity: 1;
+  pointer-events: auto;
+}
+.videobox-closed {
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.videobox-frame {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.videobox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 8px;
+  background: var(--color-deepbrown);
+  border-bottom: 1px solid rgba(185, 154, 99, 0.4);
+}
+.videobox-title {
+  font-size: 11px;
+  color: var(--color-cream);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.videobox-btn {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  color: var(--color-deepbrown);
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.videobox-stage {
+  position: relative;
+  flex: 1;
+  background: #000;
+}
+.videobox-stage iframe {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute;
+  inset: 0;
+}
+.videobox-reopen {
+  position: fixed;
+  right: 16px;
+  bottom: 92px;
+  z-index: 60;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  color: var(--color-deepbrown);
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  border: 2px solid var(--color-deepbrown);
 }
